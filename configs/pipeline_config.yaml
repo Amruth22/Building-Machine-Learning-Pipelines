@@ -1,0 +1,22 @@
+# Pipeline Configuration
+logging:
+  level: INFO
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  file: 'logs/pipeline.log'
+
+mlflow:
+  tracking_uri: 'mlruns'
+  artifact_location: 'mlruns'
+
+evaluation:
+  cv_folds: 5
+  scoring_metrics:
+    classification: ['accuracy', 'precision', 'recall', 'f1', 'roc_auc']
+    regression: ['neg_mean_squared_error', 'neg_mean_absolute_error', 'r2']
+
+# Pipeline execution settings
+execution:
+  parallel_jobs: -1
+  random_state: 42
+  test_size: 0.2
+  validation_size: 0.2
