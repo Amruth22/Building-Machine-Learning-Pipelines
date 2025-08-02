@@ -1,0 +1,12 @@
+# DVC ignore file
+*.log
+*.tmp
+__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+mlruns/
+.env
+.vscode/
+.idea/
