@@ -321,6 +321,19 @@ class FeatureEngineer:
             df['LogLSTAT'] = np.log1p(df['LSTAT'])
         
         logger.info("Created economic-related features")
+        
+        # Handle any remaining categorical columns for housing
+        categorical_columns = df.select_dtypes(include=['object', 'category']).columns.tolist()
+        for col in categorical_columns:
+            if col not in ['MEDV']:  # Don't encode target variable
+                try:
+                    col_dummies = pd.get_dummies(df[col], prefix=col)
+                    df = pd.concat([df, col_dummies], axis=1)
+                    df.drop(col, axis=1, inplace=True)
+                    logger.info(f"One-hot encoded remaining categorical column: {col}")
+                except Exception as e:
+                    logger.warning(f"Could not encode column {col}: {e}")
+        
         return df
     
     def _create_interaction_features_titanic(self, df: pd.DataFrame) -> pd.DataFrame:
