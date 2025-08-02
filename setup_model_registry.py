@@ -328,7 +328,7 @@ class ModelRegistry:
         
         # Save deployment configs
         if deployment_configs:
-            with open("model_deployment_configs.json", "w") as f:
+            with open("model_deployment_configs.json", "w", encoding='utf-8') as f:
                 json.dump(deployment_configs, f, indent=2)
             
             print(f"✅ Deployment configs saved to: model_deployment_configs.json")
@@ -375,7 +375,7 @@ class ModelRegistry:
             report_lines.append("\\n")
         
         # Save report
-        with open("model_registry_report.md", "w") as f:
+        with open("model_registry_report.md", "w", encoding='utf-8') as f:
             f.writelines(report_lines)
         
         print("✅ Model registry report saved to: model_registry_report.md")
