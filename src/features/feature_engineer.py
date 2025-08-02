@@ -245,13 +245,19 @@ class FeatureEngineer:
         """Create location-related features for Housing"""
         # Crime level categories
         if 'CRIM' in df.columns:
-            df['CrimeLevel'] = pd.qcut(df['CRIM'], q=3, labels=['Low', 'Medium', 'High'])
+            try:
+                df['CrimeLevel'] = pd.qcut(df['CRIM'], q=3, labels=['Low', 'Medium', 'High'], duplicates='drop')
+            except ValueError:
+                df['CrimeLevel'] = pd.cut(df['CRIM'], bins=3, labels=['Low', 'Medium', 'High'])
             df['HighCrime'] = (df['CRIM'] > df['CRIM'].quantile(0.75)).astype(int)
             df['LogCrime'] = np.log1p(df['CRIM'])
         
         # Distance categories
         if 'DIS' in df.columns:
-            df['DistanceGroup'] = pd.qcut(df['DIS'], q=3, labels=['Close', 'Medium', 'Far'])
+            try:
+                df['DistanceGroup'] = pd.qcut(df['DIS'], q=3, labels=['Close', 'Medium', 'Far'], duplicates='drop')
+            except ValueError:
+                df['DistanceGroup'] = pd.cut(df['DIS'], bins=3, labels=['Close', 'Medium', 'Far'])
             df['VeryClose'] = (df['DIS'] < df['DIS'].quantile(0.25)).astype(int)
         
         # Accessibility
@@ -294,7 +300,10 @@ class FeatureEngineer:
         """Create economic-related features for Housing"""
         # Tax-related features
         if 'TAX' in df.columns:
-            df['TaxLevel'] = pd.qcut(df['TAX'], q=3, labels=['Low', 'Medium', 'High'])
+            try:
+                df['TaxLevel'] = pd.qcut(df['TAX'], q=3, labels=['Low', 'Medium', 'High'], duplicates='drop')
+            except ValueError:
+                df['TaxLevel'] = pd.cut(df['TAX'], bins=3, labels=['Low', 'Medium', 'High'])
             df['HighTax'] = (df['TAX'] > df['TAX'].quantile(0.75)).astype(int)
         
         # Pupil-teacher ratio
@@ -304,7 +313,10 @@ class FeatureEngineer:
         
         # Lower status population
         if 'LSTAT' in df.columns:
-            df['LowStatusLevel'] = pd.qcut(df['LSTAT'], q=3, labels=['Low', 'Medium', 'High'])
+            try:
+                df['LowStatusLevel'] = pd.qcut(df['LSTAT'], q=3, labels=['Low', 'Medium', 'High'], duplicates='drop')
+            except ValueError:
+                df['LowStatusLevel'] = pd.cut(df['LSTAT'], bins=3, labels=['Low', 'Medium', 'High'])
             df['HighLowStatus'] = (df['LSTAT'] > df['LSTAT'].quantile(0.75)).astype(int)
             df['LogLSTAT'] = np.log1p(df['LSTAT'])
         
