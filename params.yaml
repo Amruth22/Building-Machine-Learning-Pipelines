@@ -1,0 +1,95 @@
+# Global parameters
+random_seed: 42
+test_size: 0.2
+cv_folds: 5
+
+# Titanic Classification Parameters
+titanic:
+  target_column: "Survived"
+  
+  # Random Forest
+  random_forest:
+    n_estimators: 100
+    max_depth: 10
+    min_samples_split: 5
+    min_samples_leaf: 2
+    random_state: 42
+  
+  # Logistic Regression
+  logistic_regression:
+    C: 1.0
+    max_iter: 1000
+    random_state: 42
+  
+  # Gradient Boosting
+  gradient_boosting:
+    n_estimators: 100
+    learning_rate: 0.1
+    max_depth: 6
+    random_state: 42
+  
+  # Support Vector Machine
+  svm:
+    C: 1.0
+    kernel: "rbf"
+    gamma: "scale"
+    random_state: 42
+
+# Housing Regression Parameters
+housing:
+  target_column: "MEDV"
+  
+  # Random Forest
+  random_forest:
+    n_estimators: 100
+    max_depth: 15
+    min_samples_split: 5
+    min_samples_leaf: 2
+    random_state: 42
+  
+  # Linear Regression
+  linear_regression:
+    fit_intercept: true
+  
+  # Ridge Regression
+  ridge_regression:
+    alpha: 1.0
+    random_state: 42
+  
+  # Gradient Boosting
+  gradient_boosting:
+    n_estimators: 100
+    learning_rate: 0.1
+    max_depth: 6
+    random_state: 42
+
+# Feature Engineering Parameters
+feature_engineering:
+  # Numerical features
+  numerical_features:
+    scaling_method: "standard"  # standard, minmax, robust
+    handle_outliers: true
+    outlier_method: "iqr"  # iqr, zscore
+  
+  # Categorical features
+  categorical_features:
+    encoding_method: "onehot"  # onehot, label, target
+    handle_unknown: "ignore"
+  
+  # Feature selection
+  feature_selection:
+    method: "selectkbest"  # selectkbest, rfe, lasso
+    k_features: 10
+
+# Data Processing Parameters
+data_processing:
+  # Missing value handling
+  missing_values:
+    numerical_strategy: "median"  # mean, median, mode
+    categorical_strategy: "mode"  # mode, constant
+  
+  # Data validation
+  validation:
+    min_samples: 100
+    max_missing_ratio: 0.5
+    required_columns: []
