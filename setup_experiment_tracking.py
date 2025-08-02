@@ -403,7 +403,7 @@ if __name__ == "__main__":
     main()
 '''
     
-    with open("comprehensive_experiment_tracker.py", "w") as f:
+    with open("comprehensive_experiment_tracker.py", "w", encoding='utf-8') as f:
         f.write(tracker_code)
     
     print("✅ Comprehensive experiment tracker created!")
@@ -476,7 +476,7 @@ if __name__ == "__main__":
     main()
 '''
     
-    with open("streamlit_mlflow_ui.py", "w") as f:
+    with open("streamlit_mlflow_ui.py", "w", encoding='utf-8') as f:
         f.write(ui_code)
     
     print("✅ Alternative MLflow UI created!")
