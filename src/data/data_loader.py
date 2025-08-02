@@ -25,8 +25,15 @@ class DataLoader:
         Args:
             data_dir (str): Directory containing raw data files
         """
-        self.data_dir = Path(data_dir)
+        # Handle both relative and absolute paths
+        if not os.path.isabs(data_dir):
+            # If relative path, make it relative to current working directory
+            self.data_dir = Path(os.getcwd()) / data_dir
+        else:
+            self.data_dir = Path(data_dir)
+        
         self.data_dir.mkdir(parents=True, exist_ok=True)
+        logger.info(f"DataLoader initialized with directory: {self.data_dir.absolute()}")
     
     def load_titanic(self) -> pd.DataFrame:
         """
@@ -37,9 +44,25 @@ class DataLoader:
         """
         file_path = self.data_dir / "titanic.csv"
         
-        if not file_path.exists():
-            logger.warning(f"Titanic dataset not found at {file_path}")
+        # Check multiple possible locations
+        possible_paths = [
+            file_path,
+            Path("data/raw/titanic.csv"),
+            Path(os.getcwd()) / "data/raw/titanic.csv",
+            Path("../data/raw/titanic.csv")
+        ]
+        
+        actual_path = None
+        for path in possible_paths:
+            if path.exists():
+                actual_path = path
+                break
+        
+        if actual_path is None:
+            logger.warning(f"Titanic dataset not found. Tried: {[str(p) for p in possible_paths]}")
             return pd.DataFrame()
+        
+        file_path = actual_path
         
         try:
             data = pd.read_csv(file_path)
@@ -59,9 +82,25 @@ class DataLoader:
         """
         file_path = self.data_dir / "housing.csv"
         
-        if not file_path.exists():
-            logger.warning(f"Housing dataset not found at {file_path}")
+        # Check multiple possible locations
+        possible_paths = [
+            file_path,
+            Path("data/raw/housing.csv"),
+            Path(os.getcwd()) / "data/raw/housing.csv",
+            Path("../data/raw/housing.csv")
+        ]
+        
+        actual_path = None
+        for path in possible_paths:
+            if path.exists():
+                actual_path = path
+                break
+        
+        if actual_path is None:
+            logger.warning(f"Housing dataset not found. Tried: {[str(p) for p in possible_paths]}")
             return pd.DataFrame()
+        
+        file_path = actual_path
         
         try:
             data = pd.read_csv(file_path)
