@@ -150,8 +150,10 @@ def main():
     print("🤖 Starting Model Training...")
     print("=" * 50)
     
-    # Set MLflow tracking URI
-    mlflow.set_tracking_uri("file://./mlruns")
+    # Set MLflow tracking URI (Windows compatible)
+    import os
+    mlruns_path = os.path.abspath("mlruns")
+    mlflow.set_tracking_uri(f"file:///{mlruns_path}")
     
     try:
         # Train Titanic models
