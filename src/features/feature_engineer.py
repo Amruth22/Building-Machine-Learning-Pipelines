@@ -208,7 +208,10 @@ class FeatureEngineer:
             df['AgeSquared'] = df['Age'] ** 2
             
             # Age bins (more granular)
-            df['AgeBin'] = pd.qcut(df['Age'], q=5, labels=['Q1', 'Q2', 'Q3', 'Q4', 'Q5'])
+            try:
+                df['AgeBin'] = pd.qcut(df['Age'], q=5, labels=['Q1', 'Q2', 'Q3', 'Q4', 'Q5'], duplicates='drop')
+            except ValueError:
+                df['AgeBin'] = pd.cut(df['Age'], bins=5, labels=['Q1', 'Q2', 'Q3', 'Q4', 'Q5'])
             
             logger.info("Created age-related features")
         
