@@ -1,0 +1,77 @@
+stages:
+  data_download:
+    cmd: python scripts/download_data.py
+    outs:
+    - data/raw/titanic.csv
+    - data/raw/housing.csv
+    
+  data_validation:
+    cmd: python src/data/data_validator.py
+    deps:
+    - data/raw/titanic.csv
+    - data/raw/housing.csv
+    - src/data/data_validator.py
+    outs:
+    - data/validation/data_quality_report.json
+    
+  data_preprocessing:
+    cmd: python src/data/preprocessor.py
+    deps:
+    - data/raw/titanic.csv
+    - data/raw/housing.csv
+    - src/data/preprocessor.py
+    - configs/data_config.yaml
+    outs:
+    - data/processed/titanic_clean.csv
+    - data/processed/housing_clean.csv
+    
+  feature_engineering:
+    cmd: python src/features/feature_engineer.py
+    deps:
+    - data/processed/titanic_clean.csv
+    - data/processed/housing_clean.csv
+    - src/features/feature_engineer.py
+    - configs/feature_config.yaml
+    outs:
+    - data/features/titanic_features.csv
+    - data/features/housing_features.csv
+    
+  model_training_titanic:
+    cmd: python src/pipeline/training_pipeline.py --dataset titanic
+    deps:
+    - data/features/titanic_features.csv
+    - src/pipeline/training_pipeline.py
+    - src/models/classifiers.py
+    - configs/model_config.yaml
+    params:
+    - params.yaml:titanic
+    outs:
+    - models/titanic/
+    metrics:
+    - metrics/titanic_metrics.json
+    
+  model_training_housing:
+    cmd: python src/pipeline/training_pipeline.py --dataset housing
+    deps:
+    - data/features/housing_features.csv
+    - src/pipeline/training_pipeline.py
+    - src/models/regressors.py
+    - configs/model_config.yaml
+    params:
+    - params.yaml:housing
+    outs:
+    - models/housing/
+    metrics:
+    - metrics/housing_metrics.json
+    
+  model_evaluation:
+    cmd: python src/evaluation/model_evaluator.py
+    deps:
+    - models/titanic/
+    - models/housing/
+    - data/features/titanic_features.csv
+    - data/features/housing_features.csv
+    - src/evaluation/model_evaluator.py
+    outs:
+    - reports/model_comparison.html
+    - reports/evaluation_plots/
