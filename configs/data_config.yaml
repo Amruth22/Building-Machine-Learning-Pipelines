@@ -1,0 +1,33 @@
+# Data Configuration
+datasets:
+  titanic:
+    file_path: 'data/raw/titanic.csv'
+    target_column: 'Survived'
+    id_column: 'PassengerId'
+    categorical_columns: ['Sex', 'Embarked', 'Pclass']
+    numerical_columns: ['Age', 'SibSp', 'Parch', 'Fare']
+    
+  housing:
+    file_path: 'data/raw/housing.csv'
+    target_column: 'MEDV'
+    numerical_columns: ['CRIM', 'ZN', 'INDUS', 'CHAS', 'NOX', 'RM', 'AGE', 'DIS', 'RAD', 'TAX', 'PTRATIO', 'B', 'LSTAT']
+
+# Preprocessing settings
+preprocessing:
+  test_size: 0.2
+  random_state: 42
+  validation_size: 0.2
+  
+  # Missing value handling
+  missing_values:
+    numerical_strategy: 'median'  # mean, median, mode
+    categorical_strategy: 'mode'  # mode, constant
+  
+  # Outlier handling
+  outliers:
+    method: 'iqr'  # iqr, zscore
+    threshold: 1.5
+  
+  # Scaling
+  scaling:
+    method: 'standard'  # standard, minmax, robust
