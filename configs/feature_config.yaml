@@ -1,0 +1,41 @@
+# Feature Engineering Configuration
+titanic:
+  new_features:
+    FamilySize: 'SibSp + Parch + 1'
+    IsAlone: 'FamilySize == 1'
+    Title: 'extract from Name'
+    AgeGroup: 'binned Age'
+    FareGroup: 'binned Fare'
+    
+  feature_selection:
+    method: 'selectkbest'  # selectkbest, rfe, lasso
+    k: 10
+    
+  binning:
+    age_bins: [0, 12, 18, 35, 60, 100]
+    age_labels: ['Child', 'Teen', 'Adult', 'Middle', 'Senior']
+    fare_quantiles: 4
+
+housing:
+  new_features:
+    RoomsPerHousehold: 'RM / (RM + 1)'
+    CrimeLevel: 'binned CRIM'
+    AgeGroup: 'binned AGE'
+    DistanceGroup: 'binned DIS'
+    
+  feature_selection:
+    method: 'selectkbest'
+    k: 12
+    
+  binning:
+    crime_quantiles: 3
+    distance_quantiles: 3
+    age_bins: [0, 25, 50, 75, 100]
+    age_labels: ['New', 'Moderate', 'Old', 'VeryOld']
+
+# General feature engineering settings
+general:
+  create_interactions: true
+  create_polynomials: false  # Set to true for polynomial features
+  polynomial_degree: 2
+  max_polynomial_features: 5
