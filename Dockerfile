@@ -42,9 +42,9 @@ COPY *.py ./
 COPY params.yaml ./
 COPY dvc.yaml ./
 
-# Create necessary directories
-RUN mkdir -p data/raw data/processed data/features models trained_models plots reports logs
-
+# Copy entrypoint script
+COPY docker/docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 # Copy trained models if they exist
 COPY trained_models/ ./trained_models/ 2>/dev/null || true
 COPY models/ ./models/ 2>/dev/null || true
@@ -62,7 +62,9 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:5000/health || exit 1
 
 # Expose ports
-EXPOSE 5000 8000
+# Set entrypoint
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 # Default command - can be overridden
-CMD ["python", "web_app.py"]
+# Default command - can be overridden
+CMD ["web"]
