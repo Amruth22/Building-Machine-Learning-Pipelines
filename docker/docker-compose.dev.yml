@@ -1,0 +1,99 @@
+# =============================================================================
+# Development Docker Compose Configuration
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # Development ML Application with hot reload
+  ml-app-dev:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    container_name: ml-pipeline-dev
+    ports:
+      - "5000:5000"
+      - "8888:8888"  # Jupyter
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - PYTHONPATH=/app/src
+    volumes:
+      - ../:/app
+      - /app/__pycache__
+      - /app/.pytest_cache
+    networks:
+      - mlops-dev-network
+    restart: unless-stopped
+    command: >
+      bash -c "
+        echo 'Starting development environment...' &&
+        python web_app.py
+      "
+
+  # Jupyter Lab for development
+  jupyter-dev:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    container_name: jupyter-dev
+    ports:
+      - "8889:8888"
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - PYTHONPATH=/app/src
+    volumes:
+      - ../:/app
+    networks:
+      - mlops-dev-network
+    restart: unless-stopped
+    command: >
+      bash -c "
+        jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root
+        --NotebookApp.token='' --NotebookApp.password=''
+      "
+
+  # MLflow for development
+  mlflow-dev:
+    image: python:3.8-slim
+    container_name: mlflow-dev
+    ports:
+      - "5001:5000"
+    environment:
+      - MLFLOW_BACKEND_STORE_URI=sqlite:///mlflow.db
+      - MLFLOW_DEFAULT_ARTIFACT_ROOT=/mlflow/artifacts
+    volumes:
+      - ../mlruns:/mlruns
+      - mlflow_dev_artifacts:/mlflow/artifacts
+    networks:
+      - mlops-dev-network
+    restart: unless-stopped
+    command: >
+      bash -c "
+        pip install mlflow &&
+        mlflow server 
+        --backend-store-uri sqlite:///mlflow.db
+        --default-artifact-root /mlflow/artifacts
+        --host 0.0.0.0
+        --port 5000
+      "
+
+  # Redis for development caching
+  redis-dev:
+    image: redis:6-alpine
+    container_name: redis-dev
+    ports:
+      - "6380:6379"
+    networks:
+      - mlops-dev-network
+    restart: unless-stopped
+
+# Networks
+networks:
+  mlops-dev-network:
+    driver: bridge
+
+# Volumes
+volumes:
+  mlflow_dev_artifacts:
+    driver: local
