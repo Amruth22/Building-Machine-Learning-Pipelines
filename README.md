@@ -41,7 +41,7 @@
 
 ## 🌟 What is This Project?
 
-This is a **complete, production-ready MLOps project** that demonstrates how to build **enterprise-grade machine learning pipelines** with modern MLOps practices. You'll master data versioning, experiment tracking, model registry, and deployment like a professional ML engineer!
+This is an **educational MLOps project** that teaches you how to build **machine learning pipelines** with modern MLOps practices. You'll learn data versioning, experiment tracking, model registry, and deployment through hands-on experience!
 
 ### 🎯 **Perfect for:**
 - 👨‍💻 **ML Engineers** building production systems
