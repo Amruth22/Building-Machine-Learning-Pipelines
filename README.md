@@ -792,17 +792,29 @@ services:
 
 ### 🚀 **Deployment Commands:**
 ```bash
-# Build and run containers
-docker-compose up --build
+# Check Docker environment
+python setup_docker.py check
 
-# Run in background
-docker-compose up -d
+# Build images
+python setup_docker.py build
+
+# Start production stack
+python setup_docker.py start
+
+# Start development environment
+python setup_docker.py dev
+
+# View service status
+python setup_docker.py status
 
 # View logs
-docker-compose logs ml-api
+python setup_docker.py logs
 
-# Stop containers
-docker-compose down
+# Stop all services
+python setup_docker.py stop
+
+# Clean everything
+python setup_docker.py clean
 ```
 
 ### 🌐 **API Endpoints:**
