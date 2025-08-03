@@ -1,0 +1,68 @@
+# =============================================================================
+# Development Dockerfile for ML Pipeline
+# =============================================================================
+
+FROM python:3.8-slim
+
+# Set metadata
+LABEL maintainer="ML Pipeline Team"
+LABEL description="Development ML Pipeline with debugging tools"
+LABEL version="1.0-dev"
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV FLASK_APP=web_app.py
+ENV FLASK_ENV=development
+ENV FLASK_DEBUG=1
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies including development tools
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    curl \
+    git \
+    vim \
+    htop \
+    tree \
+    wget \
+    unzip \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python dependencies with development packages
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir \
+        ipdb \
+        jupyter \
+        jupyterlab \
+        black \
+        flake8 \
+        pytest \
+        pytest-cov \
+        pre-commit
+
+# Copy source code
+COPY . .
+
+# Create necessary directories
+RUN mkdir -p data/raw data/processed data/features models trained_models plots reports logs
+
+# Set permissions (keep as root for development)
+RUN chmod +x scripts/*.py
+
+# Install package in development mode
+RUN pip install -e .
+
+# Expose ports for development
+EXPOSE 5000 8000 8888 8080
+
+# Default command for development
+CMD ["python", "web_app.py"]
