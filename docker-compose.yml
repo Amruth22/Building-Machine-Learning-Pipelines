@@ -1,0 +1,216 @@
+# =============================================================================
+# Docker Compose for Complete MLOps Stack
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # Main ML Application
+  ml-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ml-pipeline-app
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - PYTHONPATH=/app/src
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./trained_models:/app/trained_models
+      - ./logs:/app/logs
+    depends_on:
+      - mlflow
+      - postgres
+    networks:
+      - mlops-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MLflow Tracking Server
+  mlflow:
+    image: python:3.8-slim
+    container_name: mlflow-server
+    ports:
+      - "5001:5000"
+    environment:
+      - MLFLOW_BACKEND_STORE_URI=postgresql://mlflow:mlflow@postgres:5432/mlflow
+      - MLFLOW_DEFAULT_ARTIFACT_ROOT=/mlflow/artifacts
+    volumes:
+      - mlflow_artifacts:/mlflow/artifacts
+      - ./mlruns:/mlruns
+    depends_on:
+      - postgres
+    networks:
+      - mlops-network
+    restart: unless-stopped
+    command: >
+      bash -c "
+        pip install mlflow psycopg2-binary &&
+        mlflow server 
+        --backend-store-uri postgresql://mlflow:mlflow@postgres:5432/mlflow
+        --default-artifact-root /mlflow/artifacts
+        --host 0.0.0.0
+        --port 5000
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # PostgreSQL Database for MLflow
+  postgres:
+    image: postgres:13
+    container_name: mlflow-postgres
+    environment:
+      - POSTGRES_DB=mlflow
+      - POSTGRES_USER=mlflow
+      - POSTGRES_PASSWORD=mlflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mlops-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mlflow"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Jupyter Notebook Server
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jupyter-server
+    ports:
+      - "8888:8888"
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - PYTHONPATH=/app/src
+    volumes:
+      - ./notebooks:/app/notebooks
+      - ./data:/app/data
+      - ./src:/app/src
+      - ./configs:/app/configs
+    networks:
+      - mlops-network
+    restart: unless-stopped
+    command: >
+      bash -c "
+        pip install jupyterlab &&
+        jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root
+        --NotebookApp.token='' --NotebookApp.password=''
+      "
+
+  # Model Training Service
+  trainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: model-trainer
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - PYTHONPATH=/app/src
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./trained_models:/app/trained_models
+      - ./configs:/app/configs
+    depends_on:
+      - mlflow
+      - postgres
+    networks:
+      - mlops-network
+    profiles:
+      - training
+    command: python train_models_simple.py
+
+  # DVC Pipeline Runner
+  dvc-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dvc-pipeline
+    environment:
+      - PYTHONPATH=/app/src
+    volumes:
+      - ./data:/app/data
+      - ./src:/app/src
+      - ./configs:/app/configs
+      - ./.dvc:/app/.dvc
+      - ./dvc.yaml:/app/dvc.yaml
+      - ./params.yaml:/app/params.yaml
+    networks:
+      - mlops-network
+    profiles:
+      - pipeline
+    command: >
+      bash -c "
+        pip install dvc &&
+        dvc repro
+      "
+
+  # Redis for Caching (Optional)
+  redis:
+    image: redis:6-alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+    networks:
+      - mlops-network
+    restart: unless-stopped
+    profiles:
+      - cache
+
+  # Monitoring with Prometheus (Optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - mlops-network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # Grafana for Visualization (Optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - mlops-network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+# Networks
+networks:
+  mlops-network:
+    driver: bridge
+
+# Volumes
+volumes:
+  postgres_data:
+    driver: local
+  mlflow_artifacts:
+    driver: local
+  grafana_data:
+    driver: local
