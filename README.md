@@ -775,34 +775,19 @@ EXPOSE 8000
 CMD ["python", "src/api/app.py"]
 ```
 
-### 🎼 **Docker Compose:**
+### 📋 **Available Services:**
 ```yaml
-# docker-compose.yml
-version: '3.8'
-
+# Complete MLOps Stack
 services:
-  ml-api:
-    build: 
-      context: .
-      dockerfile: docker/Dockerfile
-    ports:
-      - "8000:8000"
-    environment:
-      - MODEL_NAME=TitanicSurvivalModel
-      - MODEL_STAGE=Production
-    volumes:
-      - ./models:/app/models
-      - ./data:/app/data
-    
-  mlflow:
-    image: python:3.8-slim
-    command: >
-      bash -c "pip install mlflow && 
-               mlflow server --host 0.0.0.0 --port 5000"
-    ports:
-      - "5000:5000"
-    volumes:
-      - ./mlruns:/mlruns
+  ml-app:        # Main ML web application
+  mlflow:        # Experiment tracking server  
+  postgres:      # MLflow backend database
+  jupyter:       # Notebook server
+  trainer:       # Model training service
+  dvc-runner:    # Pipeline execution
+  redis:         # Caching layer
+  prometheus:    # Monitoring
+  grafana:       # Visualization dashboard
 ```
 
 ### 🚀 **Deployment Commands:**
