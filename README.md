@@ -331,6 +331,40 @@ mlflow ui
 
 ---
 
+## ⚡ **Corrected Pipeline Execution**
+
+### 🔧 **Fixed Import Issues**
+We've fixed the Python import path issues. Here's the **correct order** to run the pipeline:
+
+```bash
+# Step 1: Download datasets
+python scripts/download_data.py
+
+# Step 2-3: Run preprocessing and feature engineering (FIXED)
+python run_preprocessing.py
+
+# Step 4: Train models
+python train_models_simple.py
+
+# Step 5: Start web interface
+python web_app.py
+```
+
+### 📋 **What Each Step Does:**
+- **Step 1**: Downloads Titanic and Housing datasets to `data/raw/`
+- **Step 2**: Cleans and preprocesses data → creates `data/processed/`
+- **Step 3**: Engineers 58+ features → creates `data/features/`
+- **Step 4**: Trains models → creates `trained_models/`
+- **Step 5**: Launches web interface for predictions
+
+### 🛠️ **Import Path Fixes Applied:**
+- ✅ Fixed `src/features/feature_engineer.py` imports
+- ✅ Fixed `src/data/preprocessor.py` imports  
+- ✅ Created `run_preprocessing.py` with correct Python paths
+- ✅ Updated README with correct execution order
+
+---
+
 ## 🚀 Getting Started
 
 ### 🎯 **Train Your First Models**
