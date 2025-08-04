@@ -255,7 +255,9 @@ python -m venv env
 env\Scripts\activate  # Windows
 # source env/bin/activate  # Mac/Linux
 pip install -r requirements.txt
-python complete_mlops_setup.py
+python scripts/download_data.py
+python run_preprocessing.py
+python train_models_simple.py
 ```
 
 ### 🚀 **Step 1: Clone the Repository**
@@ -297,27 +299,33 @@ pip install -r requirements.txt
 # - pytest (testing)
 ```
 
-### 🔧 **Step 4: Initialize MLOps Tools**
+### 🔧 **Step 4: Initialize MLOps Tools & Run Pipeline**
 ```bash
 # Initialize DVC for data versioning
 dvc init
 
-# Initialize MLflow tracking
-python scripts/setup_environment.py
-
 # Download datasets
 python scripts/download_data.py
+
+# Run preprocessing and feature engineering
+python run_preprocessing.py
+
+# Initialize MLflow tracking (optional)
+python scripts/setup_environment.py
 ```
 
-### ✅ **Step 5: Verify Installation**
+### ✅ **Step 5: Train Models & Verify**
 ```bash
-# Run tests to ensure everything works
-pytest tests/ -v
+# Train your first models
+python train_models_simple.py
+
+# Start web interface
+python web_app.py
 
 # Start Jupyter for tutorials
 jupyter notebook notebooks/
 
-# Check MLflow UI
+# Check MLflow UI (optional)
 mlflow ui
 ```
 
@@ -327,7 +335,13 @@ mlflow ui
 
 ### 🎯 **Train Your First Models**
 ```bash
-# Train models and see results
+# Step 1: Download datasets (if not done already)
+python scripts/download_data.py
+
+# Step 2 & 3: Run preprocessing and feature engineering
+python run_preprocessing.py
+
+# Step 4: Train models and see results
 python train_models_simple.py  # Learn classification and regression
 
 # Start web interface
@@ -1323,23 +1337,26 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ## 🚀 **Quick Commands Reference**
 
 ```bash
-# Complete setup (one command)
-python complete_mlops_setup.py
+# Step 1: Download data
+python scripts/download_data.py
 
-# Train models (89.4% accuracy)
+# Step 2-3: Preprocess data and engineer features
+python run_preprocessing.py
+
+# Step 4: Train models (89.4% accuracy)
 python train_models_simple.py
 
 # Start web interface
 python web_app.py
 
-# Run experiments
+# Complete MLOps setup (optional)
+python complete_mlops_setup.py
+
+# Run experiments (optional)
 python comprehensive_experiment_tracker.py
 
-# Generate reports
+# Generate reports (optional)
 python create_final_report.py
-
-# Celebrate success!
-python celebrate_success.py
 ```
 
 ---
