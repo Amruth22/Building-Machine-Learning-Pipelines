@@ -397,7 +397,7 @@ class DataPreprocessor:
         logger.info(f"Preprocessed {dataset_name} data saved to {file_path}")
 
 if __name__ == "__main__":
-    from data_loader import DataLoader
+    from src.data.data_loader import DataLoader
     
     # Initialize components
     loader = DataLoader()
