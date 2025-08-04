@@ -463,14 +463,17 @@ class FeatureEngineer:
                         logger.warning(f"Dropped problematic column: {col}")
         
         # Ensure all columns are numeric
-        for col in df.columns:
-            if df[col].dtype == 'object':
+        remaining_object_cols = df.select_dtypes(include=['object']).columns.tolist()
+        if remaining_object_cols:
+            logger.info(f"Converting remaining object columns to numeric: {remaining_object_cols}")
+            for col in remaining_object_cols:
                 try:
                     df[col] = pd.to_numeric(df[col], errors='coerce')
                     # Fill any NaN values created by coercion
                     df[col].fillna(0, inplace=True)
-                except:
-                    logger.warning(f"Could not convert {col} to numeric, dropping column")
+                    logger.info(f"Converted {col} to numeric")
+                except Exception as e:
+                    logger.warning(f"Could not convert {col} to numeric: {e}, dropping column")
                     df.drop(col, axis=1, inplace=True)
         
         logger.info(f"All categorical columns encoded. Final shape: {df.shape}")
@@ -518,14 +521,17 @@ class FeatureEngineer:
                         logger.warning(f"Dropped problematic column: {col}")
         
         # Ensure all columns are numeric
-        for col in df.columns:
-            if df[col].dtype == 'object':
+        remaining_object_cols = df.select_dtypes(include=['object']).columns.tolist()
+        if remaining_object_cols:
+            logger.info(f"Converting remaining object columns to numeric: {remaining_object_cols}")
+            for col in remaining_object_cols:
                 try:
                     df[col] = pd.to_numeric(df[col], errors='coerce')
                     # Fill any NaN values created by coercion
                     df[col].fillna(0, inplace=True)
-                except:
-                    logger.warning(f"Could not convert {col} to numeric, dropping column")
+                    logger.info(f"Converted {col} to numeric")
+                except Exception as e:
+                    logger.warning(f"Could not convert {col} to numeric: {e}, dropping column")
                     df.drop(col, axis=1, inplace=True)
         
         logger.info(f"All categorical columns encoded. Final shape: {df.shape}")
