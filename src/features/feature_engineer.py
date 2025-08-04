@@ -428,6 +428,61 @@ class FeatureEngineer:
         
         return df
     
+    def _encode_remaining_categorical(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Encode all remaining categorical columns to numeric format
+        
+        Args:
+            df (pd.DataFrame): DataFrame with potential categorical columns
+            
+        Returns:
+            pd.DataFrame: DataFrame with all categorical columns encoded
+        """
+        # Get categorical columns (object and category dtypes)
+        categorical_columns = df.select_dtypes(include=['object', 'category']).columns.tolist()
+        
+        # Remove target columns if they exist
+        target_columns = ['Survived', 'MEDV']
+        categorical_columns = [col for col in categorical_columns if col not in target_columns]
+        
+        if categorical_columns:
+            logger.info(f"Encoding categorical columns: {categorical_columns}")
+            
+            for col in categorical_columns:
+                try:
+                    # One-hot encode categorical columns
+                    col_dummies = pd.get_dummies(df[col], prefix=col, drop_first=False)
+                    df = pd.concat([df, col_dummies], axis=1)
+                    df.drop(col, axis=1, inplace=True)
+                    logger.info(f"One-hot encoded column: {col}")
+                except Exception as e:
+                    logger.warning(f"Could not encode column {col}: {e}")
+                    # Try label encoding as fallback
+                    try:
+                        from sklearn.preprocessing import LabelEncoder
+                        le = LabelEncoder()
+                        df[col] = le.fit_transform(df[col].astype(str))
+                        logger.info(f"Label encoded column: {col}")
+                    except Exception as e2:
+                        logger.error(f"Failed to encode column {col}: {e2}")
+                        # Drop problematic column as last resort
+                        df.drop(col, axis=1, inplace=True)
+                        logger.warning(f"Dropped problematic column: {col}")
+        
+        # Ensure all columns are numeric
+        for col in df.columns:
+            if df[col].dtype == 'object':
+                try:
+                    df[col] = pd.to_numeric(df[col], errors='coerce')
+                    # Fill any NaN values created by coercion
+                    df[col].fillna(0, inplace=True)
+                except:
+                    logger.warning(f"Could not convert {col} to numeric, dropping column")
+                    df.drop(col, axis=1, inplace=True)
+        
+        logger.info(f"All categorical columns encoded. Final shape: {df.shape}")
+        return df
+    
     def select_features(self, X: pd.DataFrame, y: pd.Series, dataset_name: str, 
                        method: str = 'selectkbest', k: int = 10) -> pd.DataFrame:
         """
