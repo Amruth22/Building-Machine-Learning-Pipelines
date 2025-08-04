@@ -102,6 +102,9 @@ class FeatureEngineer:
         # Statistical features
         df = self._create_statistical_features(df)
         
+        # Encode all remaining categorical columns
+        df = self._encode_remaining_categorical(df)
+        
         logger.info(f"Titanic feature engineering completed. Shape: {df.shape}")
         return df
     
