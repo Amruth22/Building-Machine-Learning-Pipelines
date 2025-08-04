@@ -137,6 +137,9 @@ class FeatureEngineer:
         # Polynomial features (limited)
         df = self._create_polynomial_features(df, degree=2, max_features=5)
         
+        # Encode all remaining categorical columns
+        df = self._encode_remaining_categorical(df)
+        
         logger.info(f"Housing feature engineering completed. Shape: {df.shape}")
         return df
     
