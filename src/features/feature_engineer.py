@@ -531,8 +531,8 @@ class FeatureEngineer:
         logger.info(f"Features for {dataset_name} saved to {file_path}")
 
 if __name__ == "__main__":
-    from data_loader import DataLoader
-    from data_preprocessor import DataPreprocessor
+    from src.data.data_loader import DataLoader
+    from src.data.preprocessor import DataPreprocessor
     
     # Initialize components
     loader = DataLoader()
